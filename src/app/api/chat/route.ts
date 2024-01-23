@@ -5,7 +5,8 @@ import { PineconeRecord, ScoredVector } from '@pinecone-database/pinecone'
 
 // Create an OpenAI API client (that's edge friendly!)
 const config = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.LLM_API_KEY,
+  basePath: process.env.LLM_COMPLETIONS_URL,
 })
 const openai = new OpenAIApi(config)
 
@@ -59,7 +60,7 @@ export async function POST(req: Request) {
 
     // Ask OpenAI for a streaming chat completion given the prompt
     const response = await openai.createChatCompletion({
-      model: 'gpt-3.5-turbo',
+      model: process.env.LLM_MODEL,
       stream: true,
       messages: [...prompt, ...sanitizedMessages.filter((message: Message) => message.role === 'user')]
     })
