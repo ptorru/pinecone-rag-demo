@@ -8,12 +8,16 @@ const config = new Configuration({
   apiKey: process.env.LLM_API_KEY,
   basePath: process.env.LLM_COMPLETIONS_URL,
 })
+const config2 = new Configuration({
+  apiKey: process.env.OPEANAI_API_KEY,
+})
 const openai = new OpenAIApi(config)
+const openai2 = new OpenAIApi(config2)
 
 // IMPORTANT! Set the runtime to edge
 export const runtime = 'edge'
 
-export async function POST(req: Request) {
+export async function POST(req: Request, isopenai: boolean = false) {
   try {
 
     const { messages, withContext, messageId } = await req.json()
@@ -59,11 +63,19 @@ export async function POST(req: Request) {
     });
 
     // Ask OpenAI for a streaming chat completion given the prompt
-    const response = await openai.createChatCompletion({
-      model: process.env.LLM_MODEL,
-      stream: true,
-      messages: [...prompt, ...sanitizedMessages.filter((message: Message) => message.role === 'user')]
-    })
+    if isopenai {
+      const response = await openai2.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        stream: true,
+        messages: [...prompt, ...sanitizedMessages.filter((message: Message) => message.role === 'user')]
+      })
+    } else {
+        const response = await openai.createChatCompletion({
+        model: process.env.LLM_MODEL,
+        stream: true,
+        messages: [...prompt, ...sanitizedMessages.filter((message: Message) => message.role === 'user')]
+      })
+    }
 
     const data = new experimental_StreamData();
 
