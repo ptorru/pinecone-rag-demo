@@ -9,6 +9,7 @@ export interface ChatInterface {
     handleInputUpdated: (event: ChangeEvent<HTMLInputElement>) => void;
     ref: Ref<ChatInterface>;
     withContext: boolean;
+    isOpenAi?: boolean;
 }
 
 interface ChatProps {
@@ -16,14 +17,16 @@ interface ChatProps {
     setContext: (data: { context: PineconeRecord[] }[]) => void;
     context?: { context: PineconeRecord[] }[] | null;
     ref: Ref<ChatInterface>
+    isOpenAi?: boolean;
 }
 
-const Chat: React.FC<ChatProps> = forwardRef<ChatInterface, ChatProps>(({ withContext, setContext, context }, ref) => {
+const Chat: React.FC<ChatProps> = forwardRef<ChatInterface, ChatProps>(({ isOpenAi, withContext, setContext, context }, ref) => {
     const [finished, setFinished] = React.useState<boolean>(false)
     const { messages, handleInputChange, handleSubmit, data } = useChat({
         sendExtraMessageFields: true,
         body: {
             withContext,
+            isOpenAi,
         },
         onFinish: () => {
             setFinished(true)
@@ -59,6 +62,7 @@ const Chat: React.FC<ChatProps> = forwardRef<ChatInterface, ChatProps>(({ withCo
         },
         withContext,
         ref: chatRef,
+        isOpenAi,
     }));
 
     return (

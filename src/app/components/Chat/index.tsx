@@ -33,10 +33,10 @@ const Chat: React.FC<ChatProps> = ({ setContext, context }) => {
     <div id="chat" className="flex flex-col w-full h-full">
       <div className="flex flex-grow h-full h-max-screen overflow-auto">
         <div className="w-1/2">
-          <ChatWrapper ref={chatWithoutContextRef} withContext={true} setContext={setContext} context={context} />
+          <ChatWrapper ref={chatWithoutContextRef} withContext={true} isOpenAi={false} setContext={setContext} context={context} />
         </div>
         <div className="w-1/2">
-          <ChatWrapper ref={chatWithContextRef} withContext={false} setContext={setContext} />
+          <ChatWrapper ref={chatWithContextRef} withContext={true} isOpenAi={true} setContext={setContext} context={context}/>
         </div>
       </div>
       <div className="w-full">

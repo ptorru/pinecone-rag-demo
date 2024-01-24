@@ -8,20 +8,21 @@ const config = new Configuration({
   apiKey: process.env.LLM_API_KEY,
   basePath: process.env.LLM_COMPLETIONS_URL,
 })
-const config2 = new Configuration({
-  apiKey: process.env.OPEANAI_API_KEY,
+const openai_config = new Configuration({
+  apiKey: process.env.OPENAI_API_KEY,
 })
-const openai = new OpenAIApi(config)
-const openai2 = new OpenAIApi(config2)
+const otherllm = new OpenAIApi(config)
+const openaillm = new OpenAIApi(openai_config)
 
 // IMPORTANT! Set the runtime to edge
 export const runtime = 'edge'
 
-export async function POST(req: Request, isopenai: boolean = false) {
+export async function POST(req: Request) {
   try {
 
-    const { messages, withContext, messageId } = await req.json()
+    const { messages, withContext, messageId, isOpenAi } = await req.json()
     console.log("messageId", messageId)
+    console.log("isOpenAi", isOpenAi)
 
     // Get the last message
     const lastMessage = messages[messages.length - 1]
@@ -62,15 +63,17 @@ export async function POST(req: Request, isopenai: boolean = false) {
       return rest;
     });
 
+    let myresponse: Response;
+
     // Ask OpenAI for a streaming chat completion given the prompt
-    if isopenai {
-      const response = await openai2.createChatCompletion({
+    if (isOpenAi) {
+      myresponse = await openaillm.createChatCompletion({
         model: "gpt-3.5-turbo",
         stream: true,
         messages: [...prompt, ...sanitizedMessages.filter((message: Message) => message.role === 'user')]
       })
     } else {
-        const response = await openai.createChatCompletion({
+        myresponse = await otherllm.createChatCompletion({
         model: process.env.LLM_MODEL,
         stream: true,
         messages: [...prompt, ...sanitizedMessages.filter((message: Message) => message.role === 'user')]
@@ -79,7 +82,7 @@ export async function POST(req: Request, isopenai: boolean = false) {
 
     const data = new experimental_StreamData();
 
-    const stream = OpenAIStream(response, {
+    const stream = OpenAIStream(myresponse, {
       onFinal(completion) {
         // IMPORTANT! you must close StreamData manually or the response will never finish.
         data.close();
