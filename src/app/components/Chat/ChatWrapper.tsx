@@ -68,7 +68,7 @@ const Chat: React.FC<ChatProps> = forwardRef<ChatInterface, ChatProps>(({ isOpen
     return (
         <div className="flex-col w-50 overflow-auto h-full" style={{ borderLeft: "1px solid #738FAB1F" }}>
             <div className={`${messages.length == 0 ? "flex flex-col justify-center items-center h-full" : "overflow-auto"}`}>
-                {context ? <Messages messages={messages} withContext={withContext} context={context} /> : <Messages messages={messages} withContext={withContext} />}
+                {context ? <Messages messages={messages} withContext={withContext} isOpenAi={isOpenAi} context={context} /> : <Messages messages={messages} isOpenAi={isOpenAi} withContext={withContext} />}
                 <div ref={bottomChatRef} />
             </div>
         </div >

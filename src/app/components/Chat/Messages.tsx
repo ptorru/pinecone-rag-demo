@@ -8,7 +8,7 @@ import type { PineconeRecord } from "@pinecone-database/pinecone";
 import { Message } from "ai";
 import { useRef, useState } from "react";
 
-export default function Messages({ messages, withContext, context }: { messages: Message[], withContext: boolean, context?: { context: PineconeRecord[] }[] }) {
+export default function Messages({ messages, withContext, isOpenAi, context }: { messages: Message[], withContext: boolean, isOpenAi: boolean, context?: { context: PineconeRecord[] }[] }) {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [anchorEls, setAnchorEls] = useState<{ [key: string]: HTMLButtonElement | null }>({});
 
@@ -68,7 +68,7 @@ export default function Messages({ messages, withContext, context }: { messages:
             <div className="ml-2 mt-1.5 flex items-center">
               <div className="flex flex-col">
                 <div className="font-bold">
-                  {message.role === "assistant" ? (withContext ? "Pinecone + OpenAI Model" : "OpenAI Model") : "You"}
+                  {message.role === "assistant" ? (withContext ? `Pinecone + ${(isOpenAi ? "OpenAI" : "OctoAI")}` : (isOpenAi ? "OpenAI" : "OctoAI")) : "You"}
                 </div>
                 <div>{message.content}</div>
                 {entry && entry.context.length > 0 && (
